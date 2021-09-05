@@ -22,4 +22,6 @@ yarn start
 npm start
 ```
 
+> The background image should be equal to the card but both are random generate.
+
 ![Example](./assets/test.gif)
