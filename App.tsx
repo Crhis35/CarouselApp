@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 
 import { Colors } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
-import { Animated } from 'react-native';
+import { Animated, Text } from 'react-native';
 import { Movie } from './src/infraestructure/types';
 import { SafeArea } from './src/components/shared/SafeView';
 import { Loading, LoadingContainer } from './src/components/shared/Loading';
@@ -46,10 +46,11 @@ export default function App() {
     const fetchData = async () => {
       try {
         const movies = await getMovies();
-        setMovies([{ key: 'empty-left' }, ...movies, { key: 'empty-right' }]);
-        const idx = await loadIndex();
-        console.log('idx', idx);
-        setCurrIndex(idx || 1);
+        if (movies.length > 0) {
+          setMovies([{ key: 'empty-left' }, ...movies, { key: 'empty-right' }]);
+          const idx = await loadIndex();
+          setCurrIndex(idx || 1);
+        }
       } catch (error) {
         console.log(error);
       } finally {
@@ -62,18 +63,26 @@ export default function App() {
     };
   }, []);
 
+  if (loading)
+    return (
+      <LoadingContainer>
+        <Loading size={50} animating={true} color={Colors.blue300} />
+      </LoadingContainer>
+    );
   return (
     <SafeArea>
-      {loading ? (
-        <LoadingContainer>
-          <Loading size={50} animating={true} color={Colors.blue300} />
-        </LoadingContainer>
-      ) : (
-        <Container>
-          <Backdrop movies={movies} scrollX={scrollX} index={index} />
-          <Carousel movies={movies} scrollX={scrollX} index={index} />
-        </Container>
-      )}
+      <Container>
+        {movies.length > 0 ? (
+          <>
+            <Backdrop movies={movies} scrollX={scrollX} index={index} />
+            <Carousel movies={movies} scrollX={scrollX} index={index} />
+          </>
+        ) : (
+          <Text style={{ fontSize: 24 }} numberOfLines={1}>
+            No movies
+          </Text>
+        )}
+      </Container>
       <StatusBar style="auto" />
     </SafeArea>
   );
